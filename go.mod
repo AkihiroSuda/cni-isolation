@@ -1,4 +1,4 @@
-module github.com/containers/dnsname
+module github.com/AkihiroSuda/cni-isolation
 
 go 1.15
 
