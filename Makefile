@@ -19,7 +19,17 @@ bin/isolation:
 	mkdir -p bin
 	$(GO_BUILD) -o bin/isolation ./plugins/meta/isolation
 
-clean:
-	rm -rf bin
+# arch: https://github.com/containernetworking/plugins/blob/e13bab99e54b4a34375450518d7db7a3da825e44/scripts/release.sh#L24
+artifacts:
+	make clean
+	mkdir _artifacts
+	for arch in amd64 arm arm64 ppc64le s390x mips64le; do \
+		GOARCH=$$arch make ; \
+		tar czvf _artifacts/cni-isolation-$${arch}.tgz --owner=0 --group=0 -C bin isolation ; \
+		rm -rf bin ; \
+	done
 
-.PHONY: binary install uninstall bin/isolation clean
+clean:
+	rm -rf bin _artifacts
+
+.PHONY: binary install uninstall bin/isolation artifacts clean
