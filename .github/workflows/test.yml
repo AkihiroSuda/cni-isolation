@@ -21,6 +21,19 @@ jobs:
         version: v1.35
         args: --verbose
 
+  cross:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    steps:
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.15.x
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - name: "Cross"
+      run: make artifacts
+
   test:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
