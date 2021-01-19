@@ -40,7 +40,7 @@ type PluginConf struct {
 	PrevResult    *current.Result         `json:"-"`
 
 	// Internal states
-	bridgeName string `json:"-"`
+	bridgeName string
 }
 
 // parseConfig parses the supplied configuration (and prevResult) from stdin.
