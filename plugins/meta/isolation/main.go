@@ -84,16 +84,30 @@ func parseConfig(stdin []byte) (*PluginConf, error) {
 	return &conf, nil
 }
 
-func getIPTables() ([]*iptables.IPTables, error) {
+func hasV6(conf *PluginConf) bool {
+	for _, f := range conf.PrevResult.IPs {
+		if f != nil && f.Version == "6" {
+			return true
+		}
+	}
+	return false
+}
+
+func getIPTables(withV6 bool) ([]*iptables.IPTables, error) {
 	ipt4, err := iptables.New()
 	if err != nil {
 		return nil, err
 	}
-	ipt6, err := iptables.NewWithProtocol(iptables.ProtocolIPv6)
-	if err != nil {
-		return nil, err
+	res := []*iptables.IPTables{ipt4}
+
+	if withV6 {
+		ipt6, err := iptables.NewWithProtocol(iptables.ProtocolIPv6)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, ipt6)
 	}
-	return []*iptables.IPTables{ipt4, ipt6}, nil
+	return res, nil
 }
 
 // cmdAdd is called for ADD requests
@@ -103,7 +117,7 @@ func cmdAdd(args *skel.CmdArgs) error {
 		return err
 	}
 
-	ipts, err := getIPTables()
+	ipts, err := getIPTables(hasV6(conf))
 	if err != nil {
 		return err
 	}
