@@ -7,7 +7,7 @@ This plugin is mostly expected to be used by the following projects:
 - BuildKit
 - [Podman](https://github.com/containers/podman/issues/5805)
 
-This plugin is being proposed to the CNI upstream: https://github.com/containernetworking/plugins/issues/573
+This plugin is being proposed to be merged into the CNI upstream `firewall` plugin: https://github.com/containernetworking/plugins/pull/584
 
 ## Install
 
