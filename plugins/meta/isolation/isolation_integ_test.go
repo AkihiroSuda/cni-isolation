@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/containernetworking/cni/libcni"
-	"github.com/containernetworking/cni/pkg/types/current"
+	types100 "github.com/containernetworking/cni/pkg/types/100"
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/containernetworking/plugins/pkg/testutils"
 	. "github.com/onsi/ginkgo"
@@ -120,7 +120,7 @@ var _ = Describe("isolation integration tests", func() {
 
 	Describe("Testing with network foo and bar", func() {
 		It("should isolate foo from bar", func() {
-			var results [nsCount]*current.Result
+			var results [nsCount]*types100.Result
 			for i := 0; i < nsCount; i++ {
 				runtimeConfig := libcni.RuntimeConf{
 					ContainerID: fmt.Sprintf("test-cni-isolation-%d", i),
@@ -154,7 +154,7 @@ var _ = Describe("isolation integration tests", func() {
 				// nolint: errcheck
 				defer deleteNetwork()
 
-				results[i], err = current.NewResultFromResult(res)
+				results[i], err = types100.NewResultFromResult(res)
 				Expect(err).NotTo(HaveOccurred())
 				fmt.Fprintf(GinkgoWriter, "results[%d]: %+v\n", i, results[i])
 			}
@@ -168,9 +168,8 @@ var _ = Describe("isolation integration tests", func() {
 
 					fmt.Fprintf(GinkgoWriter, "ping %s (ns%d@%s) -> %s (ns%d@%s)...",
 						saddr, src, srcNetName, daddr, dst, dstNetName)
-					v6 := results[dst].IPs[0].Version == "6"
 					timeoutSec := 1
-					if err := testutils.Ping(saddr, daddr, v6, timeoutSec); err != nil {
+					if err := testutils.Ping(saddr, daddr, timeoutSec); err != nil {
 						fmt.Fprintln(GinkgoWriter, "unpingable")
 						return err
 					}

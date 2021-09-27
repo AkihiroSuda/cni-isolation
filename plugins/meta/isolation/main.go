@@ -21,7 +21,7 @@ import (
 
 	"github.com/containernetworking/cni/pkg/skel"
 	"github.com/containernetworking/cni/pkg/types"
-	"github.com/containernetworking/cni/pkg/types/current"
+	types100 "github.com/containernetworking/cni/pkg/types/100"
 	"github.com/containernetworking/cni/pkg/version"
 	"github.com/coreos/go-iptables/iptables"
 
@@ -37,7 +37,7 @@ type PluginConf struct {
 
 	// Chained prev results
 	RawPrevResult *map[string]interface{} `json:"prevResult"`
-	PrevResult    *current.Result         `json:"-"`
+	PrevResult    *types100.Result        `json:"-"`
 
 	// Internal states
 	bridgeName string
@@ -61,7 +61,7 @@ func parseConfig(stdin []byte) (*PluginConf, error) {
 			return nil, fmt.Errorf("could not parse prevResult: %v", err)
 		}
 		conf.RawPrevResult = nil
-		conf.PrevResult, err = current.NewResultFromResult(res)
+		conf.PrevResult, err = types100.NewResultFromResult(res)
 		if err != nil {
 			return nil, fmt.Errorf("could not convert result to current version: %v", err)
 		}
@@ -86,7 +86,7 @@ func parseConfig(stdin []byte) (*PluginConf, error) {
 
 func hasV6(conf *PluginConf) bool {
 	for _, f := range conf.PrevResult.IPs {
-		if f != nil && f.Version == "6" {
+		if f != nil && f.Address.IP.To4() == nil {
 			return true
 		}
 	}
