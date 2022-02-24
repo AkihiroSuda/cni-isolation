@@ -1,3 +1,19 @@
+# 🎉 Merged into the CNI `firewall` plugin (v1.1.0)
+
+The `isolation` plugin was merged into the `ingressPolicy` parameter the CNI `firewall` plugin v1.1.0: https://github.com/containernetworking/plugins/commit/22dd6c553dbb9fd3e34502c0de16dd17c7461a83
+
+```json
+{
+  "type": "firewall",
+  "backend": "iptables",
+  "ingressPolicy": "same-bridge"
+}
+```
+
+The standalone `isolation` plugin is now deprecated.
+
+- - -
+
 # CNI Bridge Isolation Plugin (`/opt/cni/bin/isolation`)
 
 The `isolation` plugin isolates CNI bridge networks as in Docker bridge networks.
@@ -18,6 +34,69 @@ make && sudo make install
 The binary is installed as `/opt/cni/bin/isolation` .
 
 ## Configuration
+### nerdctl
+
+nerdctl (>= 0.5.0) uses the `isolation` plugin by default.
+
+Run `nerdctl network inspect --mode-native <NETWORK>` to confirm the current configuration.
+
+```console
+$ nerdctl network inspect --mode=native bridge
+[
+    {
+        "CNI": {
+            "cniVersion": "0.4.0",
+            "name": "bridge",
+            "nerdctlID": 0,
+            "nerdctlLabels": {},
+            "plugins": [
+                {
+                    "type": "bridge",
+                    "bridge": "nerdctl0",
+                    "isGateway": true,
+                    "ipMasq": true,
+                    "hairpinMode": true,
+                    "ipam": {
+                        "ranges": [
+                            [
+                                {
+                                    "gateway": "10.4.0.1",
+                                    "subnet": "10.4.0.0/24"
+                                }
+                            ]
+                        ],
+                        "routes": [
+                            {
+                                "dst": "0.0.0.0/0"
+                            }
+                        ],
+                        "type": "host-local"
+                    }
+                },
+                {
+                    "type": "portmap",
+                    "capabilities": {
+                        "portMappings": true
+                    }
+                },
+                {
+                    "type": "firewall"
+                },
+                {
+                    "type": "tuning"
+                },
+                {
+                    "type": "isolation"
+                }
+            ]
+        },
+        "NerdctlID": 0,
+        "NerdctlLabels": {}
+    }
+]
+```
+
+### Others
 
 `{"type":"isolation"}` needs to be inserted AFTER `{"type":"bridge"}`.
 
